@@ -1,1 +1,1 @@
-# HMS Backend Project
+# SMART CITY Backend Project
