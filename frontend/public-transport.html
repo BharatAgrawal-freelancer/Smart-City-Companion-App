@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Send Locations</title>
+</head>
+<body>
+  <h1>Send Locations to API</h1>
+
+  <form id="locationForm">
+    <label for="country">Country:</label><br>
+    <input type="text" id="country" name="country" required><br><br>
+
+    <label for="city">City:</label><br>
+    <input type="text" id="city" name="city" required><br><br>
+
+    <label for="currentLocation">Current Location:</label><br>
+    <input type="text" id="currentLocation" name="currentLocation" required><br><br>
+
+    <label for="destination">Destination:</label><br>
+    <input type="text" id="destination" name="destination" required><br><br>
+
+    <button type="submit">Send to API</button>
+  </form>
+
+  <script>
+    const apiUrl = 'http://localhost:5000/api/travel/create-travel/'; // ✅ Server ka endpoint
+
+    document.getElementById('locationForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      const country = document.getElementById('country').value;
+      const city = document.getElementById('city').value;
+      const currentLocation = document.getElementById('currentLocation').value;
+      const destination = document.getElementById('destination').value;
+
+      const data = {
+        country,
+        city,
+        currentLocation, // ✅ Aligned with backend
+        destination      // ✅ Aligned with backend
+      };
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          const token = result.id; // ✅ Controller sends back { id: savedTravelInfo._id }
+          localStorage.setItem('travelToken', token); // ✅ Save token in localStorage
+          alert(`Success! Token saved: ${token}`);
+          // ✅ Redirect to next page
+          window.location.href = 'travel_data.html';
+        } else {
+          alert('Failed to send data to API');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error sending data');
+      }
+    });
+  </script>
+</body>
+</html>

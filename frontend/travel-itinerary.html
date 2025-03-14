@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Itinerary</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --secondary: #3f37c9;
+      --accent: #f72585;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #4cc9f0;
+      --warning: #f8961e;
+      --danger: #f94144;
+      --gray-100: #f8f9fa;
+      --gray-200: #e9ecef;
+      --gray-300: #dee2e6;
+      --gray-400: #ced4da;
+      --gray-500: #adb5bd;
+      --gray-600: #6c757d;
+      --gray-700: #495057;
+      --gray-800: #343a40;
+      --gray-900: #212529;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--gray-100);
+      color: var(--gray-800);
+      overflow-x: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      padding: 1rem;
+      gap: 1rem;
+      background-color: white;
+      border-bottom: 1px solid var(--gray-300);
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      background-color: var(--primary);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      background-color: var(--secondary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-reset {
+      background-color: var(--gray-600);
+    }
+
+    .btn-reset:hover {
+      background-color: var(--gray-700);
+    }
+
+    .btn-connect {
+      background-color: var(--success);
+    }
+
+    .btn-connect:hover {
+      background-color: #3ab7db;
+    }
+
+    .btn-connect.active {
+      background-color: var(--warning);
+      box-shadow: 0 0 0 3px rgba(248, 150, 30, 0.3);
+    }
+
+    .btn-delete {
+      background-color: var(--danger);
+    }
+
+    .btn-delete:hover {
+      background-color: #e63946;
+    }
+
+    #canvas {
+      width: 100%;
+      height: calc(100vh - 140px);
+      background: aliceblue;
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .puzzle-piece {
+      width: 150px;
+      height: 150px;
+      position: absolute;
+      text-align: center;
+      user-select: none;
+      cursor: move;
+      transition: transform 0.1s, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .puzzle-piece.connecting {
+      box-shadow: 0 0 0 3px var(--warning), 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .puzzle-piece.selected-for-connection {
+      box-shadow: 0 0 0 3px var(--success), 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .puzzle-piece::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      z-index: -1;
+      transition: all 0.3s ease;
+    }
+
+    .puzzle-piece.destination::before {
+      background-color: #f8edeb;
+      border: 2px solid var(--primary);
+    }
+
+    .puzzle-piece.travel::before {
+      background-color: #e2eafc;
+      border: 2px solid var(--success);
+    }
+
+    .puzzle-piece.budget::before {
+      background-color: #d8f3dc;
+      border: 2px solid var(--warning);
+    }
+
+    .puzzle-piece.comfort::before {
+      background-color: #ffccd5;
+      border: 2px solid var(--danger);
+    }
+
+    .puzzle-piece.custom::before {
+      background-color: #daeaf6;
+      border: 2px solid var(--accent);
+    }
+
+    .puzzle-piece:hover::before {
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      transform: translateY(-5px);
+    }
+
+    .puzzle-piece.dragging::before {
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+      transform: scale(1.05);
+    }
+
+    .puzzle-piece .title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: var(--gray-800);
+      padding: 0 10px;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .puzzle-piece .title[contenteditable="true"] {
+      border-bottom: 2px dashed var(--primary);
+      outline: none;
+    }
+
+    .puzzle-piece .icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .puzzle-piece .description {
+      font-size: 0.8rem;
+      color: var(--gray-600);
+      padding: 0 10px;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-height: 40px;
+    }
+
+    .puzzle-piece .description[contenteditable="true"] {
+      border-bottom: 2px dashed var(--primary);
+      outline: none;
+      white-space: pre-wrap;
+    }
+
+    /* Puzzle piece connectors */
+    .puzzle-piece::after {
+      content: '';
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-color: inherit;
+      border-radius: 50%;
+      z-index: 5;
+    }
+
+    .puzzle-piece.destination::after {
+      right: -15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: var(--primary);
+    }
+
+    .puzzle-piece.travel::after {
+      right: -15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: var(--success);
+    }
+
+    .puzzle-piece.budget::after {
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--warning);
+    }
+
+    .clump-group {
+      border: 2px dashed var(--primary-light);
+      background-color: rgba(67, 97, 238, 0.05);
+      border-radius: 16px;
+      position: absolute;
+      padding: 20px;
+      transition: all 0.3s ease;
+      z-index: 5;
+    }
+
+    .clump-group:hover {
+      background-color: rgba(67, 97, 238, 0.1);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .clump-group::before {
+      content: 'Travel Plan';
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background-color: white;
+      padding: 0 10px;
+      font-size: 0.8rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    /* Tooltip */
+    .tooltip {
+      position: absolute;
+      background-color: var(--gray-800);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transform: translateY(-20px);
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+      font-size: 1.5rem;
+      color: var(--gray-800);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray-600);
+    }
+
+    .modal-body {
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--gray-700);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--gray-300);
+      border-radius: 4px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .form-select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--gray-300);
+      border-radius: 4px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      background-color: white;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Connection lines */
+    .connection-dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background-color: var(--primary);
+      border-radius: 50%;
+      z-index: 15;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .connection-dot:hover {
+      transform: scale(1.2);
+    }
+
+    .connection-dot.top {
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .connection-dot.right {
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .connection-dot.bottom {
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .connection-dot.left {
+      left: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* Animation for connection lines */
+    @keyframes dash {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    /* Context menu */
+    .context-menu {
+      position: absolute;
+      background-color: white;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 5px 0;
+      z-index: 1000;
+      min-width: 150px;
+      display: none;
+    }
+
+    .context-menu.active {
+      display: block;
+    }
+
+    .context-menu-item {
+      padding: 8px 15px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .context-menu-item:hover {
+      background-color: var(--gray-200);
+    }
+
+    .context-menu-item i {
+      font-size: 1rem;
+      color: var(--gray-600);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .puzzle-piece {
+        width: 120px;
+        height: 120px;
+      }
+      
+      .puzzle-piece .title {
+        font-size: 0.9rem;
+      }
+      
+      .puzzle-piece .icon {
+        font-size: 1.5rem;
+      }
+      
+      .puzzle-piece .description {
+        font-size: 0.7rem;
+      }
+
+      .controls {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <button id="reset" class="btn btn-reset">
+      <i data-feather="refresh-cw"></i>
+      <span>Reset Layout</span>
+    </button>
+    <button id="add-piece" class="btn">
+      <i data-feather="plus-circle"></i>
+      <span>Add Activity</span>
+    </button>
+    <button id="connect-mode" class="btn btn-connect">
+      <i data-feather="link"></i>
+      <span>Connect Pieces</span>
+    </button>
+    <button id="delete-mode" class="btn btn-delete">
+      <i data-feather="trash-2"></i>
+      <span>Delete Mode</span>
+    </button>
+  </div>
+
+  <div id="canvas"></div>
+  <div class="tooltip" id="tooltip"></div>
+
+  <!-- Add Activity Modal -->
+  <div class="modal-overlay" id="add-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Add New Activity</h2>
+        <button class="modal-close" id="close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="add-activity-form">
+          <div class="form-group">
+            <label for="activity-title">Title</label>
+            <input type="text" id="activity-title" class="form-control" placeholder="Enter activity title" required>
+          </div>
+          <div class="form-group">
+            <label for="activity-description">Description</label>
+            <textarea id="activity-description" class="form-control" rows="3" placeholder="Enter activity description"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="activity-icon">Icon</label>
+            <select id="activity-icon" class="form-select">
+              <option value="map-pin">Location</option>
+              <option value="activity">Activity</option>
+              <option value="coffee">Food & Drink</option>
+              <option value="camera">Sightseeing</option>
+              <option value="home">Accommodation</option>
+              <option value="shopping-bag">Shopping</option>
+              <option value="users">Meeting</option>
+              <option value="sun">Weather</option>
+              <option value="calendar">Schedule</option>
+              <option value="briefcase">Business</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-reset" id="cancel-add">Cancel</button>
+        <button class="btn" id="confirm-add">Add Activity</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div class="context-menu" id="context-menu">
+    <div class="context-menu-item" id="edit-piece">
+      <i data-feather="edit"></i> Edit
+    </div>
+    <div class="context-menu-item" id="duplicate-piece">
+      <i data-feather="copy"></i> Duplicate
+    </div>
+    <div class="context-menu-item" id="delete-piece">
+      <i data-feather="trash"></i> Delete
+    </div>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leader-line/leader-line.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const canvas = document.getElementById('canvas');
+      const tooltip = document.getElementById('tooltip');
+      const addModal = document.getElementById('add-modal');
+      const contextMenu = document.getElementById('context-menu');
+      
+      let lines = [];
+      let connections = [];
+      let isConnectMode = false;
+      let isDeleteMode = false;
+      let selectedPiece = null;
+      let currentPieceForContext = null;
+      let nextId = 1;
+      
+      // Create Puzzle Pieces
+      const pieces = [
+        { 
+          text: "Destination", 
+          x: 100, 
+          y: 150, 
+          id: "destination", 
+          class: "destination",
+          icon: "map-pin",
+          description: "Where do you want to go?"
+        },
+        { 
+          text: "Travel Medium", 
+          x: 350, 
+          y: 150, 
+          id: "travel", 
+          class: "travel",
+          icon: "plane",
+          description: "How will you get there?"
+        },
+        { 
+          text: "Travel Budget", 
+          x: 350, 
+          y: 350, 
+          id: "budget", 
+          class: "budget",
+          icon: "dollar-sign",
+          description: "What's your budget?"
+        },
+        { 
+          text: "Comfort", 
+          x: 600, 
+          y: 250, 
+          id: "comfort", 
+          class: "comfort",
+          icon: "heart",
+          description: "What amenities do you need?"
+        },
+      ];
+
+      // Create pieces
+      pieces.forEach(piece => {
+        createPuzzlePiece(piece);
+      });
+
+      function createPuzzlePiece(piece) {
+        const div = document.createElement('div');
+        div.className = `puzzle-piece ${piece.class || 'custom'}`;
+        div.id = piece.id || `piece-${nextId++}`;
+        div.style.left = piece.x + 'px';
+        div.style.top = piece.y + 'px';
+        
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'icon';
+        iconDiv.innerHTML = `<i data-feather="${piece.icon}"></i>`;
+        
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'title';
+        titleDiv.innerText = piece.text;
+        titleDiv.setAttribute('data-original', piece.text);
+        
+        const descDiv = document.createElement('div');
+        descDiv.className = 'description';
+        descDiv.innerText = piece.description || '';
+        descDiv.setAttribute('data-original', piece.description || '');
+        
+        div.appendChild(iconDiv);
+        div.appendChild(titleDiv);
+        div.appendChild(descDiv);
+        
+        // Add connection dots
+        const positions = ['top', 'right', 'bottom', 'left'];
+        positions.forEach(pos => {
+          const dot = document.createElement('div');
+          dot.className = `connection-dot ${pos}`;
+          dot.setAttribute('data-position', pos);
+          
+          // Connection dot event listeners
+          dot.addEventListener('mousedown', function(e) {
+            e.stopPropagation();
+          });
+          
+          dot.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (isConnectMode) {
+              handleConnectionDotClick(div, pos);
+            }
+          });
+          
+          div.appendChild(dot);
+        });
+        
+        canvas.appendChild(div);
+        
+        // Double click to edit
+        div.addEventListener('dblclick', function(e) {
+          if (!isConnectMode && !isDeleteMode) {
+            const target = e.target;
+            if (target.classList.contains('title') || target.classList.contains('description')) {
+              makeEditable(target);
+            }
+          }
+        });
+        
+        // Context menu
+        div.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          showContextMenu(e, div);
+        });
+        
+        // Click event for connect mode and delete mode
+        div.addEventListener('click', function() {
+          if (isConnectMode) {
+            handlePieceConnectionClick(div);
+          } else if (isDeleteMode) {
+            deletePiece(div);
+          }
+        });
+        
+        // Show tooltip on hover
+        div.addEventListener('mouseenter', function(e) {
+          if (isConnectMode) {
+            tooltip.innerText = `Click to ${selectedPiece ? 'connect with selected piece' : 'select for connection'}`;
+          } else if (isDeleteMode) {
+            tooltip.innerText = `Click to delete this piece`;
+          } else {
+            tooltip.innerText = `Drag to position • Double-click text to edit • Right-click for more options`;
+          }
+          tooltip.style.opacity = '1';
+          updateTooltipPosition(e);
+        });
+        
+        div.addEventListener('mousemove', updateTooltipPosition);
+        
+        div.addEventListener('mouseleave', function() {
+          tooltip.style.opacity = '0';
+        });
+        
+        // Initialize Feather icons
+        feather.replace();
+        
+        return div;
+      }
+
+      function updateTooltipPosition(e) {
+        tooltip.style.left = (e.clientX + 10) + 'px';
+        tooltip.style.top = (e.clientY + 10) + 'px';
+      }
+
+      // Define clump group
+      const clumpGroup = document.createElement('div');
+      clumpGroup.className = 'clump-group';
+      clumpGroup.id = 'travel-plan';
+      clumpGroup.style.left = '300px';
+      clumpGroup.style.top = '150px';
+      clumpGroup.style.width = '320px';
+      clumpGroup.style.height = '300px';
+      canvas.appendChild(clumpGroup);
+
+      // Initialize Feather icons
+      feather.replace();
+
+      // Drag & Drop + Snapping for individual pieces
+      interact('.puzzle-piece').draggable({
+        inertia: true,
+        modifiers: [
+          interact.modifiers.snap({
+            targets: [
+              interact.createSnapGrid({ x: 20, y: 20 })
+            ],
+            range: Infinity,
+            relativePoints: [{ x: 0.5, y: 0.5 }]
+          }),
+          interact.modifiers.restrict({
+            restriction: 'parent',
+            elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+            endOnly: true
+          })
+        ],
+        listeners: {
+          start(event) {
+            if (isConnectMode || isDeleteMode) return;
+            event.target.classList.add('dragging');
+          },
+          move(event) {
+            if (isConnectMode || isDeleteMode) return;
+            
+            const target = event.target;
+            const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+            const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+            target.style.transform = `translate(${x}px, ${y}px)`;
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+
+            // Check if we should move to clump
+            if (target.id === 'travel' || target.id === 'budget') {
+              const rect1 = target.getBoundingClientRect();
+              const rect2 = document.getElementById('travel-plan').getBoundingClientRect();
+              
+              if (isOverlapping(rect1, rect2)) {
+                if (!target.parentNode.classList.contains('clump-group')) {
+                  moveToClump(target);
+                }
+              }
+            }
+
+            // Update line positions
+            updateConnections();
+          },
+          end(event) {
+            if (isConnectMode || isDeleteMode) return;
+            event.target.classList.remove('dragging');
+            updateConnections();
+          }
+        }
+      });
+
+      // Clump dragging
+      interact('.clump-group').draggable({
+        inertia: true,
+        modifiers: [
+          interact.modifiers.restrict({
+            restriction: 'parent',
+            elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
+            endOnly: true
+          })
+        ],
+        listeners: {
+          move(event) {
+            if (isConnectMode || isDeleteMode) return;
+            
+            const target = event.target;
+            const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+            const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+            target.style.transform = `translate(${x}px, ${y}px)`;
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+
+            // Update the lines when clump moves
+            updateConnections();
+          }
+        }
+      });
+
+      // Move pieces to clump
+      function moveToClump(element) {
+        const clump = document.getElementById('travel-plan');
+        
+        // Get current positions
+        const elementRect = element.getBoundingClientRect();
+        const clumpRect = clump.getBoundingClientRect();
+        
+        // Calculate relative position within clump
+        const relX = elementRect.left - clumpRect.left;
+        const relY = elementRect.top - clumpRect.top;
+        
+        // Reset transform and set position relative to clump
+        element.style.transform = '';
+        element.removeAttribute('data-x');
+        element.removeAttribute('data-y');
+        
+        element.style.position = 'absolute';
+        element.style.left = relX + 'px';
+        element.style.top = relY + 'px';
+        
+        // Move to clump
+        clump.appendChild(element);
+        
+        // Update connections
+        updateConnections();
+      }
+
+      // Check if two rectangles overlap
+      function isOverlapping(rect1, rect2) {
+        return !(rect1.right < rect2.left || 
+                rect1.left > rect2.right || 
+                rect1.bottom < rect2.top || 
+                rect1.top > rect2.bottom);
+      }
+
+      // Initialize with travel and budget in clump
+      setTimeout(() => {
+        const travel = document.getElementById('travel');
+        const budget = document.getElementById('budget');
+        
+        travel.style.position = 'absolute';
+        travel.style.left = '30px';
+        travel.style.top = '30px';
+        travel.style.transform = '';
+        travel.removeAttribute('data-x');
+        travel.removeAttribute('data-y');
+        
+        budget.style.position = 'absolute';
+        budget.style.left = '30px';
+        budget.style.top = '170px';
+        budget.style.transform = '';
+        budget.removeAttribute('data-x');
+        budget.removeAttribute('data-y');
+        
+        clumpGroup.appendChild(travel);
+        clumpGroup.appendChild(budget);
+        
+        updateConnections();
+      }, 100);
+
+      // Connection handling
+      function handleConnectionDotClick(piece, position) {
+        if (!selectedPiece) {
+          // First piece selection
+          selectedPiece = {
+            element: piece,
+            position: position
+          };
+          piece.classList.add('selected-for-connection');
+        } else {
+          // Second piece selection - create connection
+          if (selectedPiece.element !== piece) {
+            createConnection(
+              selectedPiece.element, 
+              selectedPiece.position,
+              piece,
+              position
+            );
+            
+            // Reset selection
+            selectedPiece.element.classList.remove('selected-for-connection');
+            selectedPiece = null;
+          }
+        }
+      }
+
+      function handlePieceConnectionClick(piece) {
+        if (!selectedPiece) {
+          // First piece selection
+          piece.classList.add('connecting');
+          selectedPiece = {
+            element: piece,
+            position: 'auto' // Auto-detect best position
+          };
+        } else {
+          // Second piece selection - create connection
+          if (selectedPiece.element !== piece) {
+            createConnection(
+              selectedPiece.element, 
+              'auto',
+              piece,
+              'auto'
+            );
+            
+            // Reset selection
+            selectedPiece.element.classList.remove('connecting');
+            selectedPiece = null;
+          }
+        }
+      }
+
+      function createConnection(fromPiece, fromPosition, toPiece, toPosition) {
+        // Auto-detect best positions if needed
+        if (fromPosition === 'auto' || toPosition === 'auto') {
+          const fromRect = fromPiece.getBoundingClientRect();
+          const toRect = toPiece.getBoundingClientRect();
+          
+          // Calculate centers
+          const fromCenter = {
+            x: fromRect.left + fromRect.width / 2,
+            y: fromRect.top + fromRect.height / 2
+          };
+          
+          const toCenter = {
+            x: toRect.left + toRect.width / 2,
+            y: toRect.top + toRect.height / 2
+          };
+          
+          // Determine best positions based on relative positions
+          if (fromPosition === 'auto') {
+            if (Math.abs(fromCenter.x - toCenter.x) > Math.abs(fromCenter.y - toCenter.y)) {
+              // Horizontal connection is longer
+              fromPosition = fromCenter.x < toCenter.x ? 'right' : 'left';
+            } else {
+              // Vertical connection is longer
+              fromPosition = fromCenter.y < toCenter.y ? 'bottom' : 'top';
+            }
+          }
+          
+          if (toPosition === 'auto') {
+            if (Math.abs(fromCenter.x - toCenter.x) > Math.abs(fromCenter.y - toCenter.y)) {
+              // Horizontal connection is longer
+              toPosition = fromCenter.x < toCenter.x ? 'left' : 'right';
+            } else {
+              // Vertical connection is longer
+              toPosition = fromCenter.y < toCenter.y ? 'top' : 'bottom';
+            }
+          }
+        }
+        
+        // Create the connection
+        const connection = {
+          from: {
+            element: fromPiece,
+            position: fromPosition
+          },
+          to: {
+            element: toPiece,
+            position: toPosition
+          },
+          line: null
+        };
+        
+        connections.push(connection);
+        updateConnections();
+      }
+
+      function updateConnections() {
+        // Remove existing lines
+        lines.forEach(line => line.remove());
+        lines = [];
+        
+        // Create default connections if none exist
+        if (connections.length === 0) {
+          const dest = document.getElementById('destination');
+          const travelPlan = document.getElementById('travel-plan');
+          const comfort = document.getElementById('comfort');
+          
+          // Create default lines
+          const line1 = new LeaderLine(
+            LeaderLine.pointAnchor(dest, { x: '100%', y: '50%' }),
+            LeaderLine.pointAnchor(travelPlan, { x: '0%', y: '50%' }),
+            { 
+              color: '#4361ee', 
+              size: 3, 
+              path: 'fluid',
+              startSocket: 'right',
+              endSocket: 'left',
+              startPlug: 'disc',
+              endPlug: 'arrow3',
+              dash: { animation: true }
+            }
+          );
+
+          const line2 = new LeaderLine(
+            LeaderLine.pointAnchor(travelPlan, { x: '100%', y: '50%' }),
+            LeaderLine.pointAnchor(comfort, { x: '0%', y: '50%' }),
+            { 
+              color: '#4361ee', 
+              size: 3, 
+              path: 'fluid',
+              startSocket: 'right',
+              endSocket: 'left',
+              startPlug: 'disc',
+              endPlug: 'arrow3',
+              dash: { animation: true }
+            }
+          );
+
+          lines.push(line1, line2);
+        } else {
+          // Create custom connections
+          connections.forEach(conn => {
+            const fromElement = conn.from.element;
+            const toElement = conn.to.element;
+            
+            // Get socket positions
+            const startSocket = conn.from.position;
+            const endSocket = conn.to.position;
+            
+            // Create line
+            const line = new LeaderLine(
+              LeaderLine.pointAnchor(fromElement, getAnchorPoint(startSocket)),
+              LeaderLine.pointAnchor(toElement, getAnchorPoint(endSocket)),
+              { 
+                color: '#4361ee', 
+                size: 3, 
+                path: 'fluid',
+                startSocket: startSocket,
+                endSocket: endSocket,
+                startPlug: 'disc',
+                endPlug: 'arrow3',
+                dash: { animation: true }
+              }
+            );
+            
+            lines.push(line);
+            conn.line = line;
+          });
+        }
+      }
+
+      function getAnchorPoint(position) {
+        switch(position) {
+          case 'top': return { x: '50%', y: '0%' };
+          case 'right': return { x: '100%', y: '50%' };
+          case 'bottom': return { x: '50%', y: '100%' };
+          case 'left': return { x: '0%', y: '50%' };
+          default: return { x: '50%', y: '50%' };
+        }
+      }
+
+      // Make text editable
+      function makeEditable(element) {
+        element.setAttribute('contenteditable', 'true');
+        element.focus();
+        
+        // Save original text for cancel
+        const originalText = element.getAttribute('data-original');
+        
+        // Handle blur event to save changes
+        const saveChanges = function() {
+          element.setAttribute('contenteditable', 'false');
+          element.setAttribute('data-original', element.innerText);
+          element.removeEventListener('blur', saveChanges);
+          element.removeEventListener('keydown', handleKeyDown);
+        };
+        
+        // Handle keydown for enter and escape
+        const handleKeyDown = function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            saveChanges();
+          } else if (e.key === 'Escape') {
+            element.innerText = originalText;
+            saveChanges();
+          }
+        };
+        
+        element.addEventListener('blur', saveChanges);
+        element.addEventListener('keydown', handleKeyDown);
+      }
+
+      // Context menu functions
+      function showContextMenu(e, piece) {
+        e.preventDefault();
+        
+        // Store reference to current piece
+        currentPieceForContext = piece;
+        
+        // Position the context menu
+        contextMenu.style.left = e.pageX + 'px';
+        contextMenu.style.top = e.pageY + 'px';
+        contextMenu.classList.add('active');
+        
+        // Close menu when clicking elsewhere
+        const closeContextMenu = function() {
+          contextMenu.classList.remove('active');
+          document.removeEventListener('click', closeContextMenu);
+        };
+        
+        setTimeout(() => {
+          document.addEventListener('click', closeContextMenu);
+        }, 0);
+      }
+
+      // Delete piece
+      function deletePiece(piece) {
+        // Remove any connections involving this piece
+        connections = connections.filter(conn => {
+          if (conn.from.element === piece || conn.to.element === piece) {
+            if (conn.line) {
+              conn.line.remove();
+            }
+            return false;
+          }
+          return true;
+        });
+        
+        // Remove the piece
+        piece.remove();
+        
+        // Update remaining connections
+        updateConnections();
+      }
+
+      // Duplicate piece
+      function duplicatePiece(piece) {
+        const rect = piece.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+        
+        const newPiece = {
+          text: piece.querySelector('.title').innerText,
+          x: rect.left - canvasRect.left + 30,
+          y: rect.top - canvasRect.top + 30,
+          class: Array.from(piece.classList).find(cls => cls !== 'puzzle-piece'),
+          icon: piece.querySelector('.icon i').getAttribute('data-feather'),
+          description: piece.querySelector('.description').innerText
+        };
+        
+        createPuzzlePiece(newPiece);
+        feather.replace();
+      }
+
+      // Reset layout button
+      document.getElementById('reset').addEventListener('click', function() {
+        // Reset positions
+        pieces.forEach(piece => {
+          const element = document.getElementById(piece.id);
+          if (!element) return;
+          
+          // If in clump, move back to canvas
+          if (element.parentNode.classList.contains('clump-group')) {
+            canvas.appendChild(element);
+          }
+          
+          // Reset position and transform
+          element.style.left = piece.x + 'px';
+          element.style.top = piece.y + 'px';
+          element.style.transform = '';
+          element.removeAttribute('data-x');
+          element.removeAttribute('data-y');
+        });
+        
+        // Reset clump position
+        const clump = document.getElementById('travel-plan');
+        clump.style.left = '300px';
+        clump.style.top = '150px';
+        clump.style.transform = '';
+        clump.removeAttribute('data-x');
+        clump.removeAttribute('data-y');
+        
+        // Clear custom connections
+        connections = [];
+        
+        // Move travel and budget back to clump
+        setTimeout(() => {
+          const travel = document.getElementById('travel');
+          const budget = document.getElementById('budget');
+          
+          if (travel && budget) {
+            travel.style.position = 'absolute';
+            travel.style.left = '30px';
+            travel.style.top = '30px';
+            
+            budget.style.position = 'absolute';
+            budget.style.left = '30px';
+            budget.style.top = '170px';
+            
+            clump.appendChild(travel);
+            clump.appendChild(budget);
+          }
+          
+          updateConnections();
+        }, 100);
+      });
+
+      // Add new piece button
+      document.getElementById('add-piece').addEventListener('click', function() {
+        addModal.classList.add('active');
+      });
+
+      // Connect mode button
+      document.getElementById('connect-mode').addEventListener('click', function() {
+        isConnectMode = !isConnectMode;
+        isDeleteMode = false;
+        
+        this.classList.toggle('active');
+        document.getElementById('delete-mode').classList.remove('active');
+        
+        if (!isConnectMode && selectedPiece) {
+          selectedPiece.element.classList.remove('connecting');
+          selectedPiece.element.classList.remove('selected-for-connection');
+          selectedPiece = null;
+        }
+        
+        // Update cursor for all pieces
+        document.querySelectorAll('.puzzle-piece').forEach(piece => {
+          piece.style.cursor = isConnectMode ? 'pointer' : 'move';
+        });
+      });
+
+      // Delete mode button
+      document.getElementById('delete-mode').addEventListener('click', function() {
+        isDeleteMode = !isDeleteMode;
+        isConnectMode = false;
+        
+        this.classList.toggle('active');
+        document.getElementById('connect-mode').classList.remove('active');
+        
+        if (selectedPiece) {
+          selectedPiece.element.classList.remove('connecting');
+          selectedPiece.element.classList.remove('selected-for-connection');
+          selectedPiece = null;
+        }
+        
+        // Update cursor for all pieces
+        document.querySelectorAll('.puzzle-piece').forEach(piece => {
+          piece.style.cursor = isDeleteMode ? 'not-allowed' : 'move';
+        });
+      });
+
+      // Modal close button
+      document.getElementById('close-modal').addEventListener('click', function() {
+        addModal.classList.remove('active');
+      });
+
+      // Modal cancel button
+      document.getElementById('cancel-add').addEventListener('click', function() {
+        addModal.classList.remove('active');
+      });
+
+      // Modal confirm button
+      document.getElementById('confirm-add').addEventListener('click', function() {
+        const title = document.getElementById('activity-title').value;
+        const description = document.getElementById('activity-description').value;
+        const icon = document.getElementById('activity-icon').value;
+        
+        if (title) {
+          // Get canvas dimensions
+          const canvasRect = canvas.getBoundingClientRect();
+          
+          // Create new piece in center of visible canvas
+          const newPiece = {
+            text: title,
+            x: (canvasRect.width / 2) - 75,
+            y: (canvasRect.height / 2) - 75,
+            class: 'custom',
+            icon: icon,
+            description: description
+          };
+          
+          createPuzzlePiece(newPiece);
+          feather.replace();
+          
+          // Reset form
+          document.getElementById('add-activity-form').reset();
+          
+          // Close modal
+          addModal.classList.remove('active');
+        }
+      });
+
+      // Context menu event listeners
+      document.getElementById('edit-piece').addEventListener('click', function() {
+        if (currentPieceForContext) {
+          const titleElement = currentPieceForContext.querySelector('.title');
+          makeEditable(titleElement);
+        }
+      });
+
+      document.getElementById('duplicate-piece').addEventListener('click', function() {
+        if (currentPieceForContext) {
+          duplicatePiece(currentPieceForContext);
+        }
+      });
+
+      document.getElementById('delete-piece').addEventListener('click', function() {
+        if (currentPieceForContext) {
+          deletePiece(currentPieceForContext);
+        }
+      });
+
+      // Close context menu when clicking canvas
+      canvas.addEventListener('click', function() {
+        contextMenu.classList.remove('active');
+      });
+
+      // Initial line update
+      setTimeout(updateConnections, 500);
+
+      // Handle window resize
+      window.addEventListener('resize', updateConnections);
+    });
+  </script>
+</body>
+</html>

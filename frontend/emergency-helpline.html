@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Emergency Call Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f44336;
+      color: white;
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 40px;
+    }
+
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .emergency-button {
+      background-color: white;
+      color: #f44336;
+      border: none;
+      padding: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .emergency-button:hover {
+      background-color: #ffe6e6;
+      transform: translateY(-3px);
+    }
+
+    .footer {
+      margin-top: 50px;
+      font-size: 14px;
+      color: #ffcccc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🚨 Emergency Contacts 🚨</h1>
+  <p>Tap a button below to make an immediate emergency call!</p>
+
+  <div class="button-container">
+    <a class="emergency-button" href="tel:102">🚑 Call Ambulance (102)</a>
+    <a class="emergency-button" href="tel:100">🚓 Call Police (100)</a>
+    <a class="emergency-button" href="tel:101">🔥 Call Fire Brigade (101)</a>
+    <a class="emergency-button" href="tel:112">📞 National Emergency Number (112)</a>
+    <a class="emergency-button" href="tel:1091">👩‍🦰 Women Helpline (1091)</a>
+  </div>
+
+  <div class="footer">
+    <p>Stay Calm. Help is on the way.</p>
+  </div>
+
+</body>
+</html>

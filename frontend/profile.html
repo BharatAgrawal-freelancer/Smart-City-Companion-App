@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>User Profile</h2>
+        <div id="userProfile" class="card p-3 shadow-sm bg-white rounded">
+          <p><strong>Name:</strong> <span id="userName"></span></p>
+          <p><strong>City:</strong> <span id="userCity"></span></p>
+          <p><strong>Destination:</strong> <span id="userDestination"></span></p>
+          <p><strong>Purpose:</strong> <span id="userPurpose"></span></p>
+          <p><strong>Email:</strong> <span id="userEmail"></span></p>
+        </div>
+      </div>
+      
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Assume you have the email stored as token (hardcoding for now)
+        const emailToken = localStorage.getItem('token'); // Example: 'user@example.com'
+      
+        if (!emailToken) {
+          alert("No token found!");
+          return;
+        }
+      
+        fetch('http://localhost:5000/api/auth/get-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email: emailToken })
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.error) {
+              alert(data.error);
+              return;
+            }
+      
+            // Populate user details on page
+            document.getElementById('userName').textContent = data.name;
+            document.getElementById('userCity').textContent = data.city;
+            document.getElementById('userDestination').textContent = data.destination;
+            document.getElementById('userPurpose').textContent = data.purpose;
+            document.getElementById('userEmail').textContent = data.email;
+          })
+          .catch(error => {
+            console.error('Error fetching user data:', error);
+          });
+      });
+      
+</script>
+</html>

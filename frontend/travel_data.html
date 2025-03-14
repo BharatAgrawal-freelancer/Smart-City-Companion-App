@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Display Travel Info</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .travel-card {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 8px;
+      max-width: 600px;
+      margin-top: 20px;
+      background-color: #f9f9f9;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Travel Information</h1>
+
+  <button id="fetchDataBtn">Fetch Travel Info</button>
+
+  <div id="travelInfo"></div>
+
+  <script>
+    const apiUrl = 'http://localhost:5000/api/travel/get-travel'; // ✅ Your API URL here
+
+    document.getElementById('fetchDataBtn').addEventListener('click', async () => {
+      const token = localStorage.getItem('travelToken'); // ✅ Get token from localStorage
+
+      if (!token) {
+        alert('No token found in localStorage!');
+        return;
+      }
+
+      try {
+        // ✅ Call your backend API with the token
+        const response = await fetch(`${apiUrl}/${token}`);
+        const result = await response.json();
+
+        if (result.success) {
+          const data = result.data;
+          const displayDiv = document.getElementById('travelInfo');
+
+          // ✅ Create vehicle details HTML
+          let vehiclesHTML = '';
+          if (data.vehicles && data.vehicles.length > 0) {
+            vehiclesHTML = '<ul>';
+            data.vehicles.forEach(vehicle => {
+              vehiclesHTML += `
+                <li>
+                  <strong>Type:</strong> ${vehicle.type}<br>
+                  <strong>Name:</strong> ${vehicle.name}<br>
+                  <strong>Timings:</strong> ${vehicle.timings}
+                </li>
+              `;
+            });
+            vehiclesHTML += '</ul>';
+          } else {
+            vehiclesHTML = '<p>No vehicle information available.</p>';
+          }
+
+          // ✅ Populate the main info
+          displayDiv.innerHTML = `
+            <div class="travel-card">
+              <p><strong>Country:</strong> ${data.country}</p>
+              <p><strong>City:</strong> ${data.city}</p>
+              <p><strong>From Location:</strong> ${data.currentLocation}</p>
+              <p><strong>Destination:</strong> ${data.destination}</p>
+              <p><strong>Distance:</strong> ${data.distance}</p>
+              <p><strong>Ideal Travel Time:</strong> ${data.idealTime}</p>
+              <h3>Vehicles Available:</h3>
+              ${vehiclesHTML}
+              <p><small>Data Last Updated: ${new Date(data.createdAt).toLocaleString()}</small></p>
+            </div>
+          `;
+
+        } else {
+          alert('No data found for this token!');
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error fetching data');
+      }
+    });
+  </script>
+
+</body>
+</html>

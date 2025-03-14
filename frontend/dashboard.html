@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart City Companion - Dashboard</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-4">
+    <a class="navbar-brand" href="#">Smart City Companion</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+      <!-- Search -->
+      <form class="d-flex me-3">
+        <input class="form-control me-2" type="search" placeholder="Search..." aria-label="Search">
+        <button class="btn btn-outline-light" type="submit"><i class="bi bi-search"></i></button>
+      </form>
+
+      <!-- Emergency Button -->
+      <button class="btn btn-danger me-3"><i class="bi bi-exclamation-triangle-fill"></i> Emergency</button>
+
+      <!-- Profile Dropdown -->
+      <div class="dropdown">
+        <a class="btn btn-outline-light dropdown-toggle" href="#" role="button" id="profileDropdown" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle"></i> Profile
+        </a>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="./profile.html">View Profile</a></li>
+          <li><a class="dropdown-item" href="#">Settings</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><button onclick="logout()" class="dropdown-item text-danger">Logout </button> </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Dashboard Content -->
+  <div class="container my-5">
+    <div class="row g-4">
+
+      <!-- Card 1 -->
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-geo-alt-fill fs-1 text-primary"></i>
+            <h5 class="card-title mt-3">City Select</h5>
+            <p class="card-text">Choose the city you want to explore.</p>
+            <a href="city-select.html" class="btn btn-primary">Go</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-binoculars-fill fs-1 text-success"></i>
+            <h5 class="card-title mt-3">Explore Places</h5>
+            <p class="card-text">Discover tourist attractions and landmarks.</p>
+            <a href="explore-places.html" class="btn btn-success">Go</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-bus-front-fill fs-1 text-warning"></i>
+            <h5 class="card-title mt-3">Public Transport</h5>
+            <p class="card-text">Find buses, metros, and transport options.</p>
+            <a href="public-transport.html" class="btn btn-warning">Go</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-egg-fried fs-1 text-danger"></i>
+            <h5 class="card-title mt-3">Food Guide</h5>
+            <p class="card-text">Explore local cuisines and food spots.</p>
+            <a href="food-guide.html" class="btn btn-danger">Go</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-house-door-fill fs-1 text-info"></i>
+            <h5 class="card-title mt-3">Hotels & Stays</h5>
+            <p class="card-text">Find comfortable accommodations.</p>
+            <a href="hotels-stays.html" class="btn btn-info">Go</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-cart-fill fs-1 text-primary"></i>
+            <h5 class="card-title mt-3">Shopping Markets</h5>
+            <p class="card-text">Shop at local markets and malls.</p>
+            <a href="shopping-markets.html" class="btn btn-primary">Go</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-telephone-fill fs-1 text-danger"></i>
+            <h5 class="card-title mt-3">Emergency Helpline</h5>
+            <p class="card-text">Access emergency contacts quickly.</p>
+            <a href="emergency-helpline.html" class="btn btn-danger">Go</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 8 -->
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-currency-exchange fs-1 text-success"></i>
+            <h5 class="card-title mt-3">Currency & ATM</h5>
+            <p class="card-text">Find ATMs and currency exchange points.</p>
+            <a href="currency-atm.html" class="btn btn-success">Go</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 9 -->
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-calendar-event-fill fs-1 text-warning"></i>
+            <h5 class="card-title mt-3">Events & Festivals</h5>
+            <p class="card-text">Stay updated on local events and festivals.</p>
+            <a href="events-festivals.html" class="btn btn-warning">Go</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bonus Card (Optional) -->
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-translate fs-1 text-info"></i>
+            <h5 class="card-title mt-3">Language Translator</h5>
+            <p class="card-text">Translate languages for better communication.</p>
+            <a href="language-translator.html" class="btn btn-info">Go</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bonus Card (Optional) -->
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <i class="bi bi-map-fill fs-1 text-success"></i>
+            <h5 class="card-title mt-3">Travel Itinerary</h5>
+            <p class="card-text">Plan your journey and stay organized.</p>
+            <a href="travel-itinerary.html" class="btn btn-success">Go</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  
+        // Check token on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                alert('You need to login first!');
+                window.location.href = 'login.html'; // Redirect if no token
+            }
+
+            // Optional: You can validate token with the server here if needed.
+        });
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+
+  </script>
+</body>
+</html>

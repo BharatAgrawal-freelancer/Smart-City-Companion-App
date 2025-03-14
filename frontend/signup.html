@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup</title>
+</head>
+<body>
+    <h2>Signup for Smart City Companion</h2>
+    <form id="signupForm">
+        <input type="text" placeholder="Name" name="name" required><br>
+        <input type="text" placeholder="Your City" name="city" required><br>
+        <input type="text" placeholder="Destination City" name="destination" required><br>
+        <input type="text" placeholder="Purpose of Visit" name="purpose" required><br>
+        <input type="email" placeholder="Email" name="email" required><br>
+        <input type="password" placeholder="Password" name="password" required><br>
+        <button type="submit">Signup</button>
+    </form>
+
+    <script>
+        const form = document.getElementById('signupForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => data[key] = value);
+
+            const res = await fetch('http://localhost:5000/api/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            const result = await res.json();
+            alert(result.msg || 'Signup successful!');
+            console.log(result);
+        });
+    </script>
+</body>
+</html>

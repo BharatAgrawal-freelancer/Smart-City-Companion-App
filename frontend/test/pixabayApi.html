@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>City Photo Finder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      color: #333;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 250px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .images img {
+      max-width: 200px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Search City Photos</h2>
+  <form id="cityForm">
+    <input type="text" id="cityInput" placeholder="Enter city name" required />
+    <button type="submit">Get Photos</button>
+  </form>
+
+  <div class="images" id="imageContainer"></div>
+
+  <script>
+    const form = document.getElementById('cityForm');
+    const cityInput = document.getElementById('cityInput');
+    const imageContainer = document.getElementById('imageContainer');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const city = cityInput.value.trim();
+      if (!city) {
+        alert('Please enter a city name');
+        return;
+      }
+
+      imageContainer.innerHTML = '<p>Loading images...</p>';
+
+      try {
+        const response = await fetch('http://localhost:5000/api/photo/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ city }),
+        });
+
+        const data = await response.json();
+
+        if (data.images && data.images.length > 0) {
+          imageContainer.innerHTML = '';
+          data.images.forEach((img) => {
+            const imageElement = document.createElement('img');
+            imageElement.src = img.previewURL;
+            imageContainer.appendChild(imageElement);
+          });
+        } else {
+          imageContainer.innerHTML = '<p>No images found.</p>';
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        imageContainer.innerHTML = '<p>Error fetching images.</p>';
+      }
+    });
+  </script>
+
+</body>
+</html>

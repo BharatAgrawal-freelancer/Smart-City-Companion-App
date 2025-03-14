@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Explore Places Result</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 30px;
+    }
+    h1 { text-align: center; color: #333; }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .output {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 6px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Explore Places Result</h1>
+  <div class="container">
+    <div class="output" id="output">Loading data...</div>
+    <button onclick="goBack()">Search Another City</button>
+  </div>
+
+  <script>
+    async function fetchResult() {
+      const id = localStorage.getItem('exploreId');
+
+      if (!id) {
+        document.getElementById('output').textContent = "No ID found. Please search again.";
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/explore/${id}`);
+        const data = await response.json();
+
+        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        console.error("❌ Error:", error);
+        document.getElementById('output').textContent = "An error occurred. Check console for details.";
+      }
+    }
+
+    function goBack() {
+      window.location.href = 'explore-places.html';
+    }
+
+    // Call fetchResult on page load
+    window.onload = fetchResult;
+  </script>
+</body>
+</html>

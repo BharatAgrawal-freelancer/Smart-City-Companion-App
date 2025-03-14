@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>City Selection</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+  <h2 class="mb-4">Select the Cities You Want to Visit</h2>
+  
+  <form id="cityForm">
+    <div class="mb-3">
+      <label for="cityInput" class="form-label">Enter City Name</label>
+      <input type="text" class="form-control" id="cityInput" placeholder="Enter city">
+    </div>
+    <button type="button" class="btn btn-primary mb-3" onclick="addCity()">Add City</button>
+    
+    <ul id="cityList" class="list-group mb-3"></ul>
+    
+    <button type="submit" class="btn btn-success">Submit Cities</button>
+  </form>
+</div>
+
+<script>
+  const cityList = [];
+  const cityInput = document.getElementById('cityInput');
+  const cityListElement = document.getElementById('cityList');
+
+  function addCity() {
+    const city = cityInput.value.trim();
+    if (city !== '') {
+      cityList.push(city);
+      renderCityList();
+      cityInput.value = '';
+    } else {
+      alert("Please enter a city name!");
+    }
+  }
+
+  function renderCityList() {
+    cityListElement.innerHTML = '';
+    cityList.forEach((city, index) => {
+      const listItem = document.createElement('li');
+      listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+      listItem.innerHTML = `
+        ${city}
+        <button class="btn btn-sm btn-danger" onclick="removeCity(${index})">Remove</button>
+      `;
+      cityListElement.appendChild(listItem);
+    });
+  }
+
+  function removeCity(index) {
+    cityList.splice(index, 1);
+    renderCityList();
+  }
+
+  document.getElementById('cityForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (cityList.length === 0) {
+      alert("Add at least one city!");
+      return;
+    }
+
+    const emailToken = localStorage.getItem('token'); // Assuming email is stored here
+
+    if (!emailToken) {
+      alert("No user token found. Please login.");
+      return;
+    }
+
+    const payload = {
+      email: emailToken,
+      cities: cityList
+    };
+
+    try {
+      const res = await fetch('http://localhost:5000/api/cities/save-cities', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Cities submitted successfully!");
+        cityList.length = 0;
+        renderCityList();
+      } else {
+        alert(data.error || "Something went wrong");
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert("Server error!");
+    }
+  });
+</script>
+<script>
+    async function fetchUserCities() {
+        const emailToken = localStorage.getItem('token');
+    
+        if (!emailToken) {
+            alert("User not logged in! No email token found.");
+            return;
+        }
+    
+        try {
+            const res = await fetch('http://localhost:5000/api/cities/get-cities', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: emailToken })
+            });
+    
+            const data = await res.json();
+    
+            if (res.ok) {
+                console.log("User Cities:", data.data);
+                // Example: render cities to UI
+                renderFetchedCities(data.data);
+            } else {
+                alert(data.message || "Unable to fetch cities.");
+            }
+    
+        } catch (error) {
+            console.error(error);
+            alert("Server error while fetching cities!");
+        }
+    }
+    
+    // Rendering cities in a list (example)
+    function renderFetchedCities(cities) {
+        const cityListElement = document.getElementById('cityList');
+    
+        if (!cities || cities.length === 0) {
+            cityListElement.innerHTML = '<li class="list-group-item">No cities selected yet.</li>';
+            return;
+        }
+    
+        cityListElement.innerHTML = '';
+        cities.forEach((city) => {
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item';
+            listItem.textContent = city;
+            cityListElement.appendChild(listItem);
+        });
+    }
+    
+    // Call fetchUserCities() on page load (optional)
+    window.onload = fetchUserCities;
+    
+</script>
+</body>
+</html>
